@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               loadingGoogle = true;
                             });
 
-                            var result = await _auth.signUpWithGoogle();
+                            var result = await _auth.signInWithGoogle();
                             if (result == null) {
                               setState(() {
                                 loadingGoogle = false;

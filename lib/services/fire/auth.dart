@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
@@ -12,7 +12,6 @@ class AuthService {
       'https://www.googleapis.com/auth/contacts.readonly',
     ],
   );
-  final FacebookLogin _facebookSignIn = FacebookLogin();
 
   User getUser() => _auth.currentUser;
 
@@ -45,18 +44,27 @@ class AuthService {
     }
   }
 
-  Future<User> signInWithGoogle() async {
+  Future signInWithGoogle() async {
     try {
-      GoogleSignInAccount account = await _googleSignIn.signIn();
-      GoogleSignInAuthentication googleAuth = await account.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+      User user;
 
-      UserCredential result = await _auth.signInWithCredential(credential);
-      User user = result.user;
+      final GoogleSignInAccount account = await _googleSignIn.signIn();
+
+      final GoogleSignInAuthentication googleAuth =
+          await account.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredentials =
+          await _auth.signInWithCredential(credential);
+
+      user = userCredentials.user;
       return user;
-    } catch (error) {
-      print(error.toString());
+    } catch (e) {
+      print(e.toString());
       return null;
     }
   }
@@ -74,39 +82,6 @@ class AuthService {
       return user;
     } catch (error) {
       print(error.toString());
-      return null;
-    }
-  }
-
-  Future signInWithFacebook() async {
-    try {
-      User user;
-
-      final FacebookLoginResult account =
-          await _facebookSignIn.logIn(['email']);
-
-      print('token ${account.accessToken.token}');
-      final AuthCredential credential =
-          FacebookAuthProvider.credential(account.accessToken.token);
-      print('worked1');
-      print(credential.providerId);
-      final UserCredential userCredentials =
-          await _auth.signInWithCredential(credential);
-
-      user = userCredentials.user;
-      print(user);
-      return user;
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
-  }
-
-  Future signOutFacebook() async {
-    try {
-      return await _facebookSignIn.logOut();
-    } catch (e) {
-      print(e.toString());
       return null;
     }
   }
