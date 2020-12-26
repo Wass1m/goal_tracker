@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1008809505269",
+    "project_id": "goaltracker-dc635",
+    "storage_bucket": "goaltracker-dc635.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1008809505269:android:2a9de54d72077fa04b30bc",
+        "android_client_info": {
+          "package_name": "com.example.goaltracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1008809505269-vuqjs5jlubatftecmrf9falc7l55k02g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.goaltracker",
+            "certificate_hash": "0c7b29d603138b1352eb8708cd017d66e88b80bc"
+          }
+        },
+        {
+          "client_id": "1008809505269-2q4mv36ca83djk3ph9bdlmvc0d5e0rlp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcXlDqBGZ30a3pmnsnYWWKtuqR7cPDAcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1008809505269-2q4mv36ca83djk3ph9bdlmvc0d5e0rlp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
