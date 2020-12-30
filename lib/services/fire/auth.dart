@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:goaltracker/models/profile.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -29,13 +30,18 @@ class AuthService {
     }
   }
 
-  Future signUpWithEmailandPassword(String email, String password) async {
+  Future signUpWithEmailandPassword(
+      String email, String password, String fullName, String avatar) async {
     print(email);
     print(password);
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User user = result.user;
+
+      Profile profile = Profile(fullName: fullName, avatar: avatar);
+
+      await _db.collection('profiles').doc(user.uid).set(profile.toMap());
 
       return user;
     } catch (e) {
@@ -78,6 +84,17 @@ class AuthService {
 
       UserCredential result = await _auth.signInWithCredential(credential);
       User user = result.user;
+
+      var profile = await _db.collection('profiles').doc(user.uid).get();
+      print('EXISTS EXISTSLASDKLAKDL;AKDADADLKAL;DK;ALSKDL;AKDL;KSDDKSLD');
+      print(profile);
+      if (profile.data() == null) {
+        print('DOEST EXIST');
+        await _db.collection('profiles').doc(user.uid).set({
+          'fullName': user.displayName,
+          'avatar': user.photoURL,
+        });
+      }
 
       return user;
     } catch (error) {

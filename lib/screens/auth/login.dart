@@ -166,10 +166,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => HomeScreen()));
+                                Navigator.pop(context);
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => HomeScreen()));
                               }
 
                               setState(() {
@@ -227,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               loadingGoogle = true;
                             });
 
-                            var result = await _auth.signInWithGoogle();
+                            var result = await _auth.signUpWithGoogle();
                             if (result == null) {
                               setState(() {
                                 loadingGoogle = false;
@@ -237,11 +238,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               setState(() {
                                 loadingGoogle = false;
                               });
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => HomeScreen()));
+                              Navigator.pop(context);
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => HomeScreen()));
                             }
 
                             setState(() {

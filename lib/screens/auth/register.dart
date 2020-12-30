@@ -1,8 +1,14 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:goaltracker/screens/auth/welcome.dart';
 import 'package:goaltracker/screens/home/home.dart';
 import 'package:goaltracker/services/fire/auth.dart';
 import 'package:goaltracker/style/style.dart';
+import 'package:goaltracker/wrapp_user.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'login.dart';
 
@@ -14,6 +20,7 @@ class RegScreen extends StatefulWidget {
 }
 
 class _RegScreenState extends State<RegScreen> {
+  File _imageFile;
   AuthService _auth = AuthService();
 
   bool hidden = true;
@@ -26,6 +33,30 @@ class _RegScreenState extends State<RegScreen> {
 
   TextEditingController _email = TextEditingController();
   TextEditingController _pass = TextEditingController();
+  TextEditingController _name = TextEditingController();
+  String avatarPath = '';
+
+  Future<void> _pickImage(ImageSource source) async {
+    PickedFile selected =
+        await ImagePicker().getImage(source: source, imageQuality: 70);
+
+    setState(() {
+      _imageFile = File(selected.path);
+    });
+  }
+
+  final FirebaseStorage _storage =
+      FirebaseStorage.instanceFor(bucket: 'gs://goaltracker-dc635.appspot.com');
+
+  UploadTask _uploadTask;
+
+  UploadTask _startUpload() {
+    String filePath = 'images/${DateTime.now()}.png';
+
+    _uploadTask = _storage.ref().child(filePath).putFile(_imageFile);
+
+    return _uploadTask;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +103,50 @@ class _RegScreenState extends State<RegScreen> {
                 ),
               ),
               SizedBox(
+                height: 15,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.center,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: kSecondaryColor,
+                      child: ClipOval(
+                        child: new SizedBox(
+                          width: 100.0,
+                          height: 100.0,
+                          child: (_imageFile != null)
+                              ? Image.file(
+                                  _imageFile,
+                                  fit: BoxFit.fill,
+                                )
+                              : Image.network(
+                                  "https://images.unsplash.com/photo-1502164980785-f8aa41d53611?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
+                                  fit: BoxFit.fill,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 60.0),
+                    child: IconButton(
+                      icon: Icon(
+                        FontAwesomeIcons.camera,
+                        size: 30.0,
+                      ),
+                      onPressed: () {
+                        _pickImage(
+                          ImageSource.gallery,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
                 height: 30,
               ),
               TextFormField(
@@ -97,26 +172,26 @@ class _RegScreenState extends State<RegScreen> {
                 },
               ),
 
-              // SizedBox(
-              //   height: 20,
-              // ),
+              SizedBox(
+                height: 20,
+              ),
 
-              // TextFormField(
-              //   controller: _name,
-              //   autofillHints: [
-              //     AutofillHints.name,
-              //   ],
-              //   decoration: InputDecoration(
-              //     prefixIcon: Icon(Icons.person),
-              //     hintText: 'Username',
-              //   ),
-              //   validator: (value) {
-              //     if (value == '') {
-              //       return 'This field is required';
-              //     }
-              //     return null;
-              //   },
-              // ),
+              TextFormField(
+                controller: _name,
+                autofillHints: [
+                  AutofillHints.name,
+                ],
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  hintText: 'Full Name',
+                ),
+                validator: (value) {
+                  if (value == '') {
+                    return 'This field is required';
+                  }
+                  return null;
+                },
+              ),
 
               SizedBox(
                 height: 20,
@@ -191,8 +266,15 @@ class _RegScreenState extends State<RegScreen> {
                             return;
                           }
 
+// uploading the image
+                          var upload = await _startUpload();
+
+                          var url = await upload.ref.getDownloadURL();
+
+                          // login
+
                           var result = _auth.signUpWithEmailandPassword(
-                              _email.text, _pass.text);
+                              _email.text, _pass.text, _name.text, url);
 
                           if (result == null) {
                             print('ERROR LOGIN WITH EMAIL AND PASSWORD');
@@ -204,10 +286,12 @@ class _RegScreenState extends State<RegScreen> {
                               loading = false;
                             });
 
+                            // Navigator.pop(context);
+
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => HomeScreen()));
+                                    builder: (context) => WrapperUser()));
                           }
 
                           setState(() {
@@ -227,7 +311,7 @@ class _RegScreenState extends State<RegScreen> {
               FlatButton(
                 onPressed: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()));
+                      MaterialPageRoute(builder: (context) => WrapperUser()));
                 },
                 child: RichText(
                   text: TextSpan(
@@ -272,6 +356,7 @@ class _RegScreenState extends State<RegScreen> {
                               loadingGoogle = false;
                             });
 
+                            // Navigator.pop(context);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
